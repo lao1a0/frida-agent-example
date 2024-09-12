@@ -53,19 +53,43 @@ function hookTest4() {
 }
 
 
-function hookTest5() {
-    Java.perform(function () {
+// function hookTest5() {
+//     Java.perform(function () {
+//         //非静态字段的修改
+//         //使用`Java.choose()`枚举类的所有实例
+//         Java.choose("com.zj.wuaipojie.Demo", {
+//             onMatch: function (obj) {
+//                 //修改实例的非静态字段"_privateInt"的值为"123456"，并修改非静态字段"privateInt"的值为9999。
+//                 // obj._privateInt.value = "123456"; //字段名与函数名相同 前面加个下划线
+//                 console.log(obj.publicInt.value);
+//                 obj.privateInt.value = 1234678;
+//                 console.log(obj.publicInt.value);
+//             },
+//             onComplete: function (obj) {
+
+//             }
+//         });
+//     });
+// }
+/**
+ * https://www.52pojie.cn/thread-1823118-1-1.html#:~:text=ItemTouchHelper.Callback.D%20...-,%E6%AD%A3%E8%80%81%E5%B8%88%EF%BC%8C%E6%88%91%E7%BB%88%E4%BA%8E%E6%89%BE%E5%88%B0%E5%8E%9F%E5%9B%A0%E4%BA%86%EF%BC%8C%E4%BD%A0%E7%9C%8B%E5%AF%B9%E7%9D%80%E6%B2%A1%EF%BC%81,-1.%20logcat%E7%9C%8B%E4%B8%8D%E5%88%B0
+ */
+function hookTest5(){
+    Java.perform(function(){
         //非静态字段的修改
         //使用`Java.choose()`枚举类的所有实例
         Java.choose("com.zj.wuaipojie.Demo", {
-            onMatch: function (obj) {
+            onMatch: function(obj){
                 //修改实例的非静态字段"_privateInt"的值为"123456"，并修改非静态字段"privateInt"的值为9999。
-                // obj._privateInt.value = "123456"; //字段名与函数名相同 前面加个下划线
-                console.log(obj.publicInt.value);
-                obj.privateInt.value = 1234678;
-                console.log(obj.publicInt.value);
+                // obj._privateInt.value = "123456"; //字段名与函数名相同时 前面加个下划线
+                console.log("here!")
+                obj.publicInt.value = 8888;
+                obj.privateInt.value = 9999;
+                //由于样本代码的原因，需要再主动调用一下Demo类日志输出函数test()，才能在adb的log界面看到输出改变
+                obj.test();
+                console.log(obj.privateInt.value )
             },
-            onComplete: function (obj) {
+            onComplete: function(){
 
             }
         });

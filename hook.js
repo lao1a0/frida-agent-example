@@ -179,6 +179,6 @@ function hookTest10() {
     });
 }
 function main() {
-    hookTest10();
+    hookTest9();
 }
 setImmediate(main);

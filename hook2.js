@@ -4,8 +4,7 @@ function hookTest1() {
         console.log('checkVip is called');
         let result = this.checkVip();
         console.log('checkVIP ret value is ' + result);
-        // return result;
-        return true
+        return result;
     };
 }
 function hookTest2() {
@@ -215,17 +214,51 @@ function hookTest6() {
 
 function hookTest7() {
     Java.perform(function () {
-        var moduleAddr1 = Process.findModuleByName("lib52pojie.so").base;
-        var moduleAddr2 = Process.getModuleByName("lib52pojie.so").base;
-        var moduleAddr3 = Module.findBaseAddress("lib52pojie.so");
-        console.log(moduleAddr1, moduleAddr2, moduleAddr3);
-    });
+        //根据导出函数名打印基址，这里是不经过函数名进行hook而是通过计算地址的方式进行hook
+        var soAddr = Module.findBaseAddress("lib52pojie.so"); // 获得so的基址
+        console.log(soAddr);
+        var funcaddr = soAddr.add(0x1071C); // 加上偏移得到函数的地址
+        console.log(funcaddr);
+        if (funcaddr != null) {
+            Interceptor.attach(funcaddr, {
+                onEnter: function (args) {  //args参数
+
+                },
+                onLeave: function (retval) {  //retval返回值
+                    console.log(retval.toInt32());
+                }
+            })
+        }
+    })
 }
 
-function main() {
-    Java.perform(function () {
-        console.log("*".repeat(50));
-        hookTest6();
+
+function hook_dlopen() {
+    var dlopen = Module.findExportByName(null, "dlopen");
+    Interceptor.attach(dlopen, {
+        onEnter: function (args) {
+            var so_name = args[0].readCString();
+            if (so_name.indexOf("lib52pojie.so") >= 0) this.call_hook = true;
+        }, onLeave: function (retval) {
+            if (this.call_hook) hookTest24();
+        }
     });
+    // 高版本Android系统使用android_dlopen_ext
+    var android_dlopen_ext = Module.findExportByName(null, "android_dlopen_ext");
+    Interceptor.attach(android_dlopen_ext, {
+        onEnter: function (args) {
+            var so_name = args[0].readCString();
+            if (so_name.indexOf("lib52pojie.so") >= 0) this.call_hook = true;
+        }, onLeave: function (retval) {
+            if (this.call_hook) hookTest24();
+        }
+    });
+}
+function main() {
+    hookTest26();
+    // Java.perform(function () {
+    //     console.log("*".repeat(50));
+    //     hook_dlopen();
+    // });
 }
 setImmediate(main);

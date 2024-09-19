@@ -51,7 +51,7 @@ def download_images():
 
 
     # 调用frida脚本
-    process = frida.get_usb_device().attach("com.zj.wuaipojie")
+    process = frida.get_usb_device().attach("wuaipojie")
     script = process.create_script(jsCode)
     script.on("message", on_message)  # 输出 打印
     script.load()
